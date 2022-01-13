@@ -9,8 +9,8 @@ from torch import multiprocessing
 from argparse import ArgumentParser
 from sklearn.model_selection import StratifiedKFold
 
-from src.nezha.util.classifier_utils import *
-from src.nezha.modeling.modeling import NeZhaModel, NeZhaPreTrainedModel
+from nezha.util.classifier_utils import *
+from nezha.modeling.modeling import NeZhaModel, NeZhaPreTrainedModel
 
 sys.path.append('../../src')
 multiprocessing.set_sharing_strategy('file_system')

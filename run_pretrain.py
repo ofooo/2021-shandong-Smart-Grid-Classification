@@ -25,7 +25,7 @@ from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data import Dataset, DataLoader
 from torch.cuda.amp import autocast as autocast, GradScaler
 
-from src.nezha.modeling.modeling import NeZhaConfig, NeZhaForMaskedLM
+from nezha.modeling.modeling import NeZhaConfig, NeZhaForMaskedLM
 
 sys.path.append('src')
 warnings.filterwarnings('ignore')
