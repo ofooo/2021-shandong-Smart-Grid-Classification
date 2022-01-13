@@ -27,7 +27,6 @@ from torch.cuda.amp import autocast as autocast, GradScaler
 
 from nezha.modeling.modeling import NeZhaConfig, NeZhaForMaskedLM
 
-sys.path.append('src')
 warnings.filterwarnings('ignore')
 
 
@@ -54,8 +53,8 @@ def seed_everything(seed):
 
 
 def read_data(args, tokenizer: BertTokenizer) -> dict:
-    train_path = os.path.join(args.pretrain_data_path, 'shandong', 'train.csv')
-    test_path = os.path.join(args.pretrain_data_path, 'shandong', 'testa_nolabel.csv')
+    train_path = os.path.join(args.pretrain_data_dir, 'train.csv')
+    test_path = os.path.join(args.pretrain_data_dir, 'testa_nolabel.csv')
 
     train_df = pd.read_csv(train_path, sep=',')
     test_df = pd.read_csv(test_path, sep=',')
@@ -143,7 +142,7 @@ class DGDataCollator:
         return input_ids, token_type_ids, attention_mask
 
     def mask_tokens(
-        self, inputs: torch.Tensor, special_tokens_mask: Optional[torch.Tensor] = None
+            self, inputs: torch.Tensor, special_tokens_mask: Optional[torch.Tensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Prepare masked tokens inputs/labels for masked language modeling: 80% MASK, 10% random, 10% original.
@@ -405,24 +404,32 @@ def pretrain(args):
     gc.collect()
 
 
-def main():
+def main_pretrain():
+    data_dir = '/root/data/2022.01_山东_网格事件智能分类/a1'
+    pre_model_dir = '/root/data/pretrain/nezha-cn-base'
+    if not os.path.isdir(data_dir):
+        data_dir = 'E:/code/AI_competition/2022.01_山东_网格事件智能分类/data/a1'
+        pre_model_dir = 'E:/code/data/pretrain_model_file/nezha-cn-base'
+
+    pretrain_data_dir = 'data/shandong'
+    new_pretrain_dir = 'data/new_pretrain_dir/0113'
     parser = ArgumentParser()
 
     parser.add_argument('--num_workers', type=int, default=0)
 
     parser.add_argument('--debug', type=bool, default=False)
-    parser.add_argument('--pretrain_data_path', type=str,
-                        default='../../data')
+    parser.add_argument('--pretrain_data_dir', type=str,
+                        default=pretrain_data_dir)
     parser.add_argument('--pretrain_model_path', type=str,
-                        default=f'../../user_data/pretrain_model/nezha-cn-base')
+                        default=pre_model_dir)
     parser.add_argument('--data_cache_path', type=str,
-                        default=f'../../user_data/process_data/pkl/pretrain.pkl')
+                        default=f'{pretrain_data_dir}/pretrain.pkl')
     parser.add_argument('--vocab_path', type=str,
-                        default=f'../../user_data/pretrain_model/nezha-cn-base/vocab.txt')
+                        default=f'{pre_model_dir}/vocab.txt')
     parser.add_argument('--save_path', type=str,
-                        default='../../user_data/new_self_pretrained_model')
+                        default=new_pretrain_dir)
     parser.add_argument('--record_save_path', type=str,
-                        default='../../user_data/new_self_pretrained_model_record')
+                        default=f'{new_pretrain_dir}/record')
 
     parser.add_argument('--num_epochs', type=int, default=150)
     parser.add_argument('--max_seq_len', type=int, default=350)
@@ -444,12 +451,12 @@ def main():
 
     parser.add_argument('--fp16', type=str, default=True)
 
-    parser.add_argument('--device', type=str, default='cuda')
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu')
 
     warnings.filterwarnings('ignore')
     args = parser.parse_args()
 
-    args.n_gpus = torch.cuda.device_count()
+    args.n_gpus = torch.cuda.device_count() if torch.cuda.is_available() else 1
     args.batch_size *= args.n_gpus
 
     create_dirs(args.save_path)
@@ -461,4 +468,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main_pretrain()

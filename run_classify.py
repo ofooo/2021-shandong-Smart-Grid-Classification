@@ -12,7 +12,6 @@ from sklearn.model_selection import StratifiedKFold
 from nezha.util.classifier_utils import *
 from nezha.modeling.modeling import NeZhaModel, NeZhaPreTrainedModel
 
-sys.path.append('../../src')
 multiprocessing.set_sharing_strategy('file_system')
 
 
@@ -301,7 +300,7 @@ def predict_cv(args):
     print('\n>> predict completed .')
 
 
-def main(task_type):
+def main_train_classify(task_type):
     parser = ArgumentParser()
 
     parser.add_argument('--output_path', type=str,
@@ -353,4 +352,4 @@ def main(task_type):
 
 
 if __name__ == '__main__':
-    main('shandong')
+    main_train_classify('shandong')
